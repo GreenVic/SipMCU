@@ -1,7 +1,7 @@
 #include "mystr.h"
 #include <stdlib.h>
 #include <string.h>
-#include "mymore.h"
+
 
 
 const MYSTR mystr_null = {NULL, 0};

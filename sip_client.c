@@ -189,9 +189,6 @@ void sip_rtp_dac_audio_fill(void)
 {
 
 	int index = -1;
-	//int index1;
-	//uint16_t magnitude_941, magnitude_1336;
-	//uint16_t m_941, m_1336;
 
 
 	if (audio_buf_play_index > -1) { //воспроизводим буфер
@@ -210,36 +207,6 @@ void sip_rtp_dac_audio_fill(void)
 		if (l >= AUDIO_BUF_SZ) {
 			lwrb_read(&sip_rtp_dac_buf, law_buf_data, AUDIO_BUF_SZ);
 			Law_Decodes16(audio_buf[index], AUDIO_BUF_SZ, law_buf_data, AUDIO_BUF_SZ, rtp_codec);
-
-/*
-			if (sip_dtmf > 0) {
-
-				magnitude_941 = 0;
-				magnitude_1336 = 0;
-
-
-				for (int i = 0; i < GOERTZEL_SPLIT; i++) {
-					index1 = i * goertzel_coeff_941.numSamples;
-					m_941 = (uint16_t)goertzel_get_mag(&audio_buf[index][index1], &goertzel_coeff_941);
-					m_1336 = (uint16_t)goertzel_get_mag(&audio_buf[index][index1], &goertzel_coeff_1336);
-					magnitude_941 = MAX(magnitude_941, m_941);
-					magnitude_1336 = MAX(magnitude_1336, m_1336);
-				}
-
-				if ( (magnitude_941 >= sip_dtmf) && (magnitude_1336 >= sip_dtmf)) {
-					ulog_fmt("sip: magnitude_941=%d, magnitude_1336=%d\r\n", magnitude_941, magnitude_1336);
-					//sip_open_door();
-				}
-
-
-
-
-				tmp_magnitude_941 = magnitude_941;
-				tmp_magnitude_1336 = magnitude_1336;
-
-			}
-*/
-
 			audio_buf_fill[index] = TRUE;
 		}
 
@@ -454,8 +421,6 @@ void sip_abort_session(void)
 	sip_invite_abort = TRUE;
 
 	sip_invite_uri[0] = '\0';
-    //Call.Account.LocalSeqNum++;
-	//Call.LocalSeqNum = Call.Account.LocalSeqNum;
 
 
 	if (sip_state != SIP_STATE_DEFAULT)	{
@@ -464,18 +429,11 @@ void sip_abort_session(void)
 			len = CreateCancelRequest(sip_buf, MAX_SIP_BUF_SZ, &Call);
 			uip_udp_send_my(sip_conn, sip_buf, len);
 			ulog("sip: snd CANCEL abort session\r\n");
-			//sip_buf[len] = '\0';
-			//ulog(sip_buf);
-			//ulog("\r\n");
 		} else {
 			len = CreateByeRequest(sip_buf, MAX_SIP_BUF_SZ, &Call);
 			uip_udp_send_my(sip_conn, sip_buf, len);
 			ulog("sip: snd BYE abort session\r\n");
 		}
-		//sip_buf[len] = '\0';
-		//ulog_fmt("sip: snd BYE abort session (%d)\r\n", len);
-		//ulog(sip_buf);
-		//ulog("\r\n");
 	}
 
 	if (sip_rtp_conn != NULL) {
@@ -582,7 +540,6 @@ void sip_rcv_packet(char * data, uint16_t data_len)
             	if (SendAutRegisterRequest == FALSE) {
 
     				Call.Account.LocalSeqNum++;
-    	  			//Call.LocalSeqNum = Call.Account.LocalSeqNum;
 
             		sip_answer(CreateAutRegisterRequest(sip_buf, MAX_SIP_BUF_SZ, &M, &Call.Account), "sip: snd AutRegisterRequest\r\n");
             		SendAutRegisterRequest = TRUE;
@@ -773,34 +730,6 @@ void sip_init(void)
 
 
 
-/*
-    Call.SessionID = 2345;
-    Call.SessionNo = 2345;
-    Call.Account.LocalPort = 23156;
-    Call.LocalRtpPort = 20280;
-    strcpy(Call.LocalTag, "22sdfsd2423");
-    strcpy(Call.Account.Server, "df.feelinhome.ru");
-    Call.Account.ServerPort = 9060;
-    strcpy(Call.Account.Branch, "z9hG4bKPj57ba556fab2b4d7aaffe54ae55cdb558");
-    strcpy(Call.Account.Tag, "e3228d7dac5c41a0b53ca65a25b81b44");
-    strcpy(Call.Account.CallID, "d4ff74f019d44f04a50c1e4eceb350a8");
-    Call.Account.LocalSeqNum = 12;
-    Call.Account.Expires = 300;
-    strcpy(Call.AudioCodec.GetId, "0");
-    strcpy(Call.Account.FormattedName, "4444");
-    strcpy(Call.Account.User, "4444");
-    strcpy(Call.Account.Password, "iZBMOedfEy");
-    strcpy(Call.Account.LocalIP, get_ip_str((unsigned char *)&uip_hostaddr));
-    strcpy(Call.Account.MappedLocalIP, get_ip_str((unsigned char *)&uip_hostaddr));
-    strcpy(Call.Account.LocalURI , "sip:");
-    strcat(Call.Account.LocalURI , Call.Account.User);
-    strcat(Call.Account.LocalURI , "@");
-    strcat(Call.Account.LocalURI , Call.Account.LocalIP);
-    strcat(Call.Account.LocalURI , ":");
-    strcat(Call.Account.LocalURI , int2str(Call.Account.LocalPort));
-*/
-
-
 	Call.SessionID = 2000 + RANDOM(1000);
 	Call.SessionNo = Call.SessionID;
     Call.Account.LocalPort = 23156;
@@ -856,18 +785,11 @@ void sip_appcall(void)
 {
 
 	  char * ptr;
-	  //int len;
 
-	  //if ( uip_udp_conn->lport == HTONS(Call.LocalRtpPort) )
-		//  ulog_fmt("sip: rcv rtp data lport=%d ip=%s rport=%d ip_datalen=%d uip_flags=%d\r\n", HTONS(uip_udp_conn->lport), get_ip_str((unsigned char *)&uip_udp_conn->ripaddr), HTONS(uip_udp_conn->rport), uip_datalen(), uip_flags);
-
-	  //uip_ipaddr_t *src_addr = (uip_ipaddr_t*)&(uip_udp_conn->ripaddr);
-	  //ulog_fmt("sip: appcall (%d) recv from %d.%d.%d.%d:%d\r\n", uip_flags,  uip_ipaddr1(src_addr), uip_ipaddr2(src_addr), uip_ipaddr3(src_addr), uip_ipaddr4(src_addr), HTONS(uip_udp_conn->rport));
 	  if (uip_poll()) {
 
 		  	if (sip_conn == uip_udp_conn) {
 
-		  		//if ( HAL_Diff(sip_regiser_tick) > sip_time_register ) {
 		  		if ((sip_rtp_conn == NULL) && (HAL_Diff(sip_regiser_tick) > sip_time_register)) {
 		  			SendAutRegisterRequest = FALSE;
 					Call.LocalSeqNum++;
@@ -878,23 +800,11 @@ void sip_appcall(void)
 
 
 		  		else if (strlen(sip_invite_uri) != 0) {
-/*
-	                  strcpy(Call.RemoteURI, "sip:44259@df.feelinhome.ru");
-	                  strcpy(Call.Branch, "z9hG4bK3af730a6e92f460");
-	                  strcpy(Call.CallID, "3cbf958e6f43d91905c3fa964a373dcb");
-	                  strcpy(Call.SendRecv, "sendrecv");
-	                  strcpy(Call.RemoteUser, "44259");
-	                  Call.LocalSeqNum++;
-	                  Call.RemoteTag[0] = '\0';
-	                  Call.Account.LocalSeqNum = Call.LocalSeqNum;
-*/
 
 		  			strcpy(Call.RemoteURI, "sip:");
 		  			mystrncat(Call.RemoteURI, sip_invite_uri, MAX_SIP_URI_SIZE);
 		  			memstrncpy(Call.Branch, GenerateBranch(), MAX_SIP_BRANCH_SIZE);
 		  			memstrncpy(Call.CallID,  GenerateCallID(), MAX_SIP_CALL_ID_SIZE);
-		  			//memstrncpy(Call.Branch, "z9hG4bK3af730a6e92f460", MAX_SIP_BRANCH_SIZE);
-		  			//memstrncpy(Call.CallID, "3cbf958e6f43d91905c3fa964a373dcb", MAX_SIP_CALL_ID_SIZE);
 		  			memstrncpy(Call.SendRecv, "sendrecv", MAX_SIP_SEND_RECV_SIZE);
 		  			memstrncpy(Call.RemoteUser, sip_invite_uri, MAX_SIP_REMOTE_USER_SIZE);
 					if ((ptr = strstr(Call.RemoteUser, "@")) != NULL )  *ptr = '\0';
@@ -912,24 +822,6 @@ void sip_appcall(void)
 		  	}
 
 
-//при приеме rtp - это не выщывается
-/*
-		  	else if (sip_rtp_conn == uip_udp_conn) {
-
-
-				if (sip_rtp_net_out_index >= MAX_RTP_DATA_PAYLOAD_SZ) {
-//					ulog_fmt("sip: sip_rtp_conn == uip_udp_conn, sip_rtp_net_out_index=%d\r\n", sip_rtp_net_out_index);
-					sip_rtp_data_fill_header();
-					int len = sizeof(RTPHEADER) + sip_rtp_net_out_index;
-					memcpy(uip_appdata, &sip_rtp_net_out, len);
-					uip_udp_send(len);
-					sip_rtp_net_out_index = 0;
-					ulog_fmt("sip: send_rtp (%d)\r\n", len);
-				}
-
-			}
-
-*/
 	  }
 
 	  else if (uip_newdata()) {
